@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_ravimtestgit_harness_python_pipeline_sample_1723389881415-pr-trigger-input-set
+  identifier: Build_ravimtestgit_harness_python_pipeline_sample_1723389881415prtriggerinputset
+  orgIdentifier: default
+  projectIdentifier: default_project
+  pipeline:
+    identifier: Build_ravimtestgit_harness_python_pipeline_sample_1723389881415
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
