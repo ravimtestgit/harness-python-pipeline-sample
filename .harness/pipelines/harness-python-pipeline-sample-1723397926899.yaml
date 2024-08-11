@@ -52,7 +52,7 @@ pipeline:
                   identifier: BuildAndPushDockerRegistry_1
                   spec:
                     connectorRef: account.DockerHubAccess
-                    repo: ravimdocker/ravi-exercise
+                    repo: rmettadocker/harnessexercise
                     tags:
                       - latest
                     dockerfile: pythondockerfile
@@ -87,7 +87,7 @@ pipeline:
                   identifier: python_server
                   spec:
                     connectorRef: account.DockerHubAccess
-                    image: ravimdocker/ravi-exercise
+                    image: rmettadocker/harnessexercise
                     shell: Sh
                     command: python3 /python-pipeline-samples/app.py
               - step:
@@ -100,7 +100,7 @@ pipeline:
                     shell: Sh
                     command: |-
                       sleep 20
-                      curl docker:5000
+                      curl localhost:5000
   properties:
     ci:
       codebase:
