@@ -99,8 +99,8 @@ pipeline:
                     image: curlimages/curl:7.73.0
                     shell: Sh
                     command: |-
-                      sleep 10
-                      curl sdp-identifier:8080
+                      sleep 60
+                      curl localhost:5000
   properties:
     ci:
       codebase:
