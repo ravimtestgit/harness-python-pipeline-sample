@@ -100,7 +100,7 @@ pipeline:
                     shell: Sh
                     command: |-
                       sleep 10
-                      curl localhost:5000
+                      curl 127.0.0.1:5000
   properties:
     ci:
       codebase:
