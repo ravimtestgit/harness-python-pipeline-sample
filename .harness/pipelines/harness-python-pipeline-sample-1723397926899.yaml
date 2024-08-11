@@ -1,0 +1,33 @@
+pipeline:
+  name: ravi-build-python-pipeline-sample
+  identifier: Build_ravimtestgit_harness_python_pipeline_sample_1723398046883
+  projectIdentifier: raviexercise
+  orgIdentifier: default
+  stages:
+    - stage:
+        name: Build
+        identifier: Build
+        type: CI
+        spec:
+          cloneCodebase: true
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Echo Welcome Message
+                  identifier: Echo_Welcome_Message
+                  spec:
+                    shell: Sh
+                    command: echo "Welcome to Harness CI"
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.Github_OAuth_1723388863815
+        repoName: ravimtestgit/harness-python-pipeline-sample
+        build: <+input>
