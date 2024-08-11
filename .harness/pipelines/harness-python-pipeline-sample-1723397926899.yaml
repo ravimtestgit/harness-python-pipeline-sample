@@ -99,8 +99,8 @@ pipeline:
                     image: curlimages/curl:7.73.0
                     shell: Sh
                     command: |-
-                      sleep 60
-                      curl localhost:5000
+                      sleep 20
+                      curl docker:5000
   properties:
     ci:
       codebase:
