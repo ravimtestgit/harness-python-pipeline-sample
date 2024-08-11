@@ -54,7 +54,7 @@ pipeline:
                     connectorRef: account.DockerHubAccess
                     repo: ravimdocker/ravi-exercise
                     tags:
-                      - ravi1
+                      - latest
                     dockerfile: pythondockerfile
           platform:
             os: Linux
