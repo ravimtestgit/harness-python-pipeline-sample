@@ -109,7 +109,7 @@ pipeline:
         spec:
           deploymentType: Kubernetes
           service:
-            serviceRef: raviservice
+            serviceRef: testnewservice
             serviceInputs:
               serviceDefinition:
                 type: Kubernetes
