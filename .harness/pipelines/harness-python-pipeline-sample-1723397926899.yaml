@@ -133,6 +133,8 @@ pipeline:
                   spec:
                     skipDryRun: false
                     pruningEnabled: false
+                    delegateSelectors:
+                      - kubernetes-delegate-ravi
             rollbackSteps:
               - step:
                   name: Rollback Rollout Deployment
@@ -148,6 +150,8 @@ pipeline:
                 - AllErrors
               action:
                 type: StageRollback
+        delegateSelectors:
+          - kubernetes-delegate-ravi
   properties:
     ci:
       codebase:
