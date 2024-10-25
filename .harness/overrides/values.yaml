@@ -1,0 +1,6 @@
+overrides:
+  variables:
+    - name: environment
+      type: String
+      value: development
+      required: false
