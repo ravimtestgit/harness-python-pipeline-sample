@@ -1,0 +1,5 @@
+service:
+  name: testremote
+  identifier: testremote
+  orgIdentifier: TPM
+  projectIdentifier: RaviMTraining
