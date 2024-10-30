@@ -1,0 +1,10 @@
+overrides:
+  variables:
+    - name: environment
+      type: String
+      value: development
+      required: false
+    - name: env2
+      type: String
+      value: integration
+      required: false
