@@ -44,19 +44,6 @@ pipeline:
                       pytest
               - parallel:
                   - step:
-                      type: BuildAndPushECR
-                      name: BuildAndPushECR_1
-                      identifier: BuildAndPushECR_1
-                      spec:
-                        connectorRef: raviaws
-                        region: us-east-1
-                        account: "491085423717"
-                        imageName: python-pipeline-samples
-                        tags:
-                          - <+codebase.commitSha>
-                          - latest
-                        caching: true
-                  - step:
                       type: Bandit
                       name: Security Scan
                       identifier: Security_Scan
@@ -69,6 +56,17 @@ pipeline:
                         advanced:
                           log:
                             level: info
+                  - step:
+                      type: BuildAndPushDockerRegistry
+                      name: BuildAndPushDockerRegistry_1
+                      identifier: BuildAndPushDockerRegistry_1
+                      spec:
+                        connectorRef: ravidockerconnector
+                        repo: rmettadocker/pythonapp
+                        tags:
+                          - <+codebase.commitSha>
+                          - latest
+                        caching: true
     - stage:
         name: integration test
         identifier: integration_test
@@ -105,7 +103,7 @@ pipeline:
                   name: Connection Test
                   identifier: Connection_Test
                   spec:
-                    connectorRef: raviaws
+                    connectorRef: ravidockerconnector
                     image: curlimages/curl:7.73.0
                     shell: Sh
                     command: |-
