@@ -94,7 +94,6 @@ pipeline:
                     connectorRef: ravidockerconnector
                     image: python-pipeline-samples
                     shell: Sh
-                    command: python3 /python-pipeline-samples/app.py
                   description: server connection
               - step:
                   type: Run
