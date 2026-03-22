@@ -39,7 +39,9 @@ pipeline:
                     connectorRef: raviaws
                     image: python:3.10.6-alpine
                     shell: Sh
-                    command: python -m compileall ./
+                    command: |-
+                      pip install -r requirements.txt
+                      pytest
               - step:
                   type: BuildAndPushECR
                   name: BuildAndPushECR_1
@@ -48,8 +50,9 @@ pipeline:
                     connectorRef: raviaws
                     region: us-east-1
                     account: "491085423717"
-                    imageName: python:3.10.6-alpine
+                    imageName: python-pipeline-samples
                     tags:
+                      - <+codebase.commitSha>
                       - latest
                     caching: true
     - stage:
