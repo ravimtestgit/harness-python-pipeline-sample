@@ -1,0 +1,96 @@
+pipeline:
+  name: Python App
+  identifier: Python_App
+  projectIdentifier: testravimetta
+  orgIdentifier: TPMLabs
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: ravigitconnector
+        repoName: harness-python-pipeline-sample
+        build: <+input>
+  stages:
+    - stage:
+        name: Build App
+        identifier: Build_App
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          caching:
+            enabled: true
+            override: false
+          buildIntelligence:
+            enabled: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Code Compile
+                  identifier: Code_Compile
+                  spec:
+                    connectorRef: raviaws
+                    image: python:3.10.6-alpine
+                    shell: Sh
+                    command: python -m compileall ./
+              - step:
+                  type: BuildAndPushECR
+                  name: BuildAndPushECR_1
+                  identifier: BuildAndPushECR_1
+                  spec:
+                    connectorRef: raviaws
+                    region: us-east-1
+                    account: "491085423717"
+                    imageName: python:3.10.6-alpine
+                    tags:
+                      - latest
+                    caching: true
+    - stage:
+        name: integration test
+        identifier: integration_test
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          caching:
+            enabled: true
+            override: false
+            paths: []
+          buildIntelligence:
+            enabled: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Background
+                  name: python server
+                  identifier: python_server
+                  spec:
+                    connectorRef: raviaws
+                    image: python-pipeline-samples
+                    shell: Sh
+                    command: python3 /python-pipeline-samples/app.py
+                  description: server connection
+              - step:
+                  type: Run
+                  name: Connection Test
+                  identifier: Connection_Test
+                  spec:
+                    connectorRef: raviaws
+                    image: curlimages/curl:7.73.0
+                    shell: Sh
+                    command: |-
+                      sleep 10
+                      curl localhost:5000
