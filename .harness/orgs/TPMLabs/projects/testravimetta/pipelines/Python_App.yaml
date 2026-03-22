@@ -92,7 +92,7 @@ pipeline:
                   identifier: python_server
                   spec:
                     connectorRef: ravidockerconnector
-                    image: python-pipeline-samples
+                    image: python-sample-pipelines
                     shell: Sh
                   description: server connection
               - step:
