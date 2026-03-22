@@ -91,7 +91,7 @@ pipeline:
                   name: python server
                   identifier: python_server
                   spec:
-                    connectorRef: raviaws
+                    connectorRef: ravidockerconnector
                     image: python-pipeline-samples
                     shell: Sh
                     command: python3 /python-pipeline-samples/app.py
