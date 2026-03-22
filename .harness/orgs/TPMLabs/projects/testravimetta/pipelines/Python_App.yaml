@@ -60,7 +60,7 @@ pipeline:
                       identifier: BuildAndPushDockerRegistry_1
                       spec:
                         connectorRef: ravidockerconnector
-                        repo: rmettadocker/pythonapp
+                        repo: rmettadocker/python-sample-pipelines
                         tags:
                           - <+codebase.commitSha>
                           - latest
