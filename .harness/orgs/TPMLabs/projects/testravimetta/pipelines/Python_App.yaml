@@ -42,19 +42,33 @@ pipeline:
                     command: |-
                       pip install -r requirements.txt
                       pytest
-              - step:
-                  type: BuildAndPushECR
-                  name: BuildAndPushECR_1
-                  identifier: BuildAndPushECR_1
-                  spec:
-                    connectorRef: raviaws
-                    region: us-east-1
-                    account: "491085423717"
-                    imageName: python-pipeline-samples
-                    tags:
-                      - <+codebase.commitSha>
-                      - latest
-                    caching: true
+              - parallel:
+                  - step:
+                      type: BuildAndPushECR
+                      name: BuildAndPushECR_1
+                      identifier: BuildAndPushECR_1
+                      spec:
+                        connectorRef: raviaws
+                        region: us-east-1
+                        account: "491085423717"
+                        imageName: python-pipeline-samples
+                        tags:
+                          - <+codebase.commitSha>
+                          - latest
+                        caching: true
+                  - step:
+                      type: Bandit
+                      name: Security Scan
+                      identifier: Security_Scan
+                      spec:
+                        mode: orchestration
+                        config: default
+                        target:
+                          type: repository
+                          detection: auto
+                        advanced:
+                          log:
+                            level: info
     - stage:
         name: integration test
         identifier: integration_test
