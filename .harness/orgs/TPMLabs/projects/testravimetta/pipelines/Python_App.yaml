@@ -92,7 +92,7 @@ pipeline:
                   identifier: python_server
                   spec:
                     connectorRef: ravidockerconnector
-                    image: python-sample-pipelines
+                    image: rmettadocker/python-sample-pipelines:<+codebase.commitSha>
                     shell: Sh
                   description: server connection
               - step:
