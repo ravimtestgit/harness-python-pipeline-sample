@@ -105,4 +105,4 @@ pipeline:
                     shell: Sh
                     command: |-
                       sleep 10
-                      curl localhost:5000
+                      curl python_server:5000
