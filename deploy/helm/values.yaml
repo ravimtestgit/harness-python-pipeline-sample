@@ -1,0 +1,16 @@
+replicaCount: 1
+
+image:
+  repository: 491085423717.dkr.ecr.us-east-2.amazonaws.com/python-sample-app
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 5000
+  targetPort: 5000
+
+resources: {}
+
+env:
+  PORT: "5000"
