@@ -31,15 +31,6 @@ pipeline:
             spec: {}
           execution:
             steps:
-              - step:
-                  type: Run
-                  name: Code Compile
-                  identifier: Code_Compile
-                  spec:
-                    connectorRef: ravidockerconnector
-                    image: python:3.10.6-alpine
-                    shell: Sh
-                    command: pip install -r requirements.txt
               - parallel:
                   - step:
                       type: Bandit
@@ -64,6 +55,18 @@ pipeline:
                         tags:
                           - <+codebase.commitSha>
                           - latest
+                        caching: true
+                  - step:
+                      type: BuildAndPushECR
+                      name: BuildAndPushECR_1
+                      identifier: BuildAndPushECR_1
+                      spec:
+                        connectorRef: raviaws
+                        region: us-east-2
+                        account: "491085423717"
+                        imageName: python-sample-app
+                        tags:
+                          - <+pipeline.sequenceId>
                         caching: true
     - stage:
         name: integration test
