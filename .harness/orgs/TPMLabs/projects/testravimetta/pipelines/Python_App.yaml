@@ -46,17 +46,6 @@ pipeline:
                           log:
                             level: info
                   - step:
-                      type: BuildAndPushDockerRegistry
-                      name: BuildAndPushDockerRegistry_1
-                      identifier: BuildAndPushDockerRegistry_1
-                      spec:
-                        connectorRef: ravidockerconnector
-                        repo: rmettadocker/python-sample-pipelines
-                        tags:
-                          - <+codebase.commitSha>
-                          - latest
-                        caching: true
-                  - step:
                       type: BuildAndPushECR
                       name: BuildAndPushECR_1
                       identifier: BuildAndPushECR_1
@@ -94,8 +83,8 @@ pipeline:
                   name: python server
                   identifier: python_server
                   spec:
-                    connectorRef: ravidockerconnector
-                    image: rmettadocker/python-sample-pipelines:<+codebase.commitSha>
+                    connectorRef: raviaws
+                    image: 491085423717.dkr.ecr.us-east-2.amazonaws.com/python-sample-app:<+pipeline.sequence.id>
                     shell: Sh
                   description: server connection
               - step:
