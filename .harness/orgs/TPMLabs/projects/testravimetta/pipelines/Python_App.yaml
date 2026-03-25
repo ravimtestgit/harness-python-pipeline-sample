@@ -55,7 +55,7 @@ pipeline:
                         account: "491085423717"
                         imageName: python-sample-app
                         tags:
-                          - <+pipeline.sequenceId>
+                          - <+codebase.commitSha>
                         caching: true
     - stage:
         name: integration test
@@ -63,7 +63,7 @@ pipeline:
         description: ""
         type: CI
         spec:
-          cloneCodebase: true
+          cloneCodebase: false
           caching:
             enabled: true
             override: false
@@ -84,7 +84,7 @@ pipeline:
                   identifier: python_server
                   spec:
                     connectorRef: raviaws
-                    image: 491085423717.dkr.ecr.us-east-2.amazonaws.com/python-sample-app:<+pipeline.sequence.id>
+                    image: 491085423717.dkr.ecr.us-east-2.amazonaws.com/python-sample-app:<+codebase.commitSha>
                     shell: Sh
                   description: server connection
               - step:
