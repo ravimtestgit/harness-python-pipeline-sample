@@ -12,15 +12,16 @@ pipeline:
         build: <+input>
   stages:
     - stage:
-        name: Build App
-        identifier: Build_App
-        description: ""
+        name: Build_and_Test
+        identifier: Build_and_Test
         type: CI
         spec:
           cloneCodebase: true
           caching:
             enabled: true
-            override: false
+            override: true
+            paths:
+              - /root/.cache/pip
           buildIntelligence:
             enabled: true
           platform:
@@ -31,75 +32,63 @@ pipeline:
             spec: {}
           execution:
             steps:
-              - parallel:
-                  - step:
-                      type: Bandit
-                      name: Security Scan
-                      identifier: Security_Scan
-                      spec:
-                        mode: orchestration
-                        config: default
-                        target:
-                          type: repository
-                          detection: auto
-                        advanced:
-                          log:
-                            level: info
-                  - step:
-                      type: BuildAndPushECR
-                      name: BuildAndPushECR_1
-                      identifier: BuildAndPushECR_1
-                      spec:
-                        connectorRef: raviaws
-                        region: us-east-2
-                        account: "491085423717"
-                        imageName: python-sample-app
-                        tags:
-                          - <+codebase.commitSha>
-                        caching: true
-    - stage:
-        name: integration test
-        identifier: integration_test
-        description: ""
-        type: CI
-        spec:
-          cloneCodebase: true
-          caching:
-            enabled: true
-            override: false
-            paths: []
-          buildIntelligence:
-            enabled: true
-          platform:
-            os: Linux
-            arch: Amd64
-          runtime:
-            type: Cloud
-            spec: {}
-          execution:
-            steps:
-              - step:
-                  type: Background
-                  name: python server
-                  identifier: python_server
-                  spec:
-                    connectorRef: raviaws
-                    image: 491085423717.dkr.ecr.us-east-2.amazonaws.com/python-sample-app:<+codebase.commitSha>
-                    shell: Sh
-                    command: python3 app.py
-                    envVariables:
-                      PORT: "5000"
-                    portBindings:
-                      "5000": "5000"
-                  description: server connection
               - step:
                   type: Run
-                  name: Connection Test
-                  identifier: Connection_Test
+                  name: Install_Dependencies
+                  identifier: Install_Dependencies
                   spec:
                     connectorRef: ravidockerconnector
-                    image: curlimages/curl:7.73.0
+                    image: python:3.11
                     shell: Sh
                     command: |-
-                      sleep 10
-                      curl python_server:5000
+                      python --version
+                      pip install --upgrade pip
+                      pip install -r requirements.txt
+              - step:
+                  type: Run
+                  name: Unit_Tests
+                  identifier: Unit_Tests
+                  spec:
+                    connectorRef: ravidockerconnector
+                    image: python:3.11
+                    shell: Sh
+                    command: |-
+                      pip install --upgrade pip
+                      pip install -r requirements.txt
+                      pytest -v --junitxml=test-results/junit.xml
+              - step:
+                  type: Bandit
+                  name: Security_Scan
+                  identifier: Security_Scan
+                  spec:
+                    mode: orchestration
+                    config: default
+                    target:
+                      type: repository
+                      detection: auto
+                    advanced:
+                      log:
+                        level: info
+              - step:
+                  type: BuildAndPushECR
+                  name: Build_And_Push_ECR
+                  identifier: Build_And_Push_ECR
+                  spec:
+                    connectorRef: raviaws
+                    region: us-east-2
+                    account: "491085423717"
+                    imageName: python-sample-app
+                    dockerfile: Dockerfile
+                    context: .
+                    tags:
+                      - <+codebase.commitSha>
+                    caching: true
+              - step:
+                  type: Run
+                  name: Build_Metadata
+                  identifier: Build_Metadata
+                  spec:
+                    connectorRef: ravidockerconnector
+                    image: alpine:3.19
+                    shell: Sh
+                    command: "echo \"Built image: 491085423717.dkr.ecr.us-east-2.amazonaws.com/python-sample-app:<+codebase.commitSha>\""
