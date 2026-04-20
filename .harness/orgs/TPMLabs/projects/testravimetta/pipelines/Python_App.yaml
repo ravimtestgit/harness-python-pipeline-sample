@@ -1,5 +1,5 @@
 pipeline:
-  name: Python App
+  name: Python_App
   identifier: Python_App
   projectIdentifier: testravimetta
   orgIdentifier: TPMLabs
@@ -34,8 +34,8 @@ pipeline:
             steps:
               - step:
                   type: Run
-                  name: Install_Dependencies
-                  identifier: Install_Dependencies
+                  name: Install_and_Test
+                  identifier: Install_and_Test
                   spec:
                     connectorRef: ravidockerconnector
                     image: python:3.11
@@ -44,17 +44,7 @@ pipeline:
                       python --version
                       pip install --upgrade pip
                       pip install -r requirements.txt
-              - step:
-                  type: Run
-                  name: Unit_Tests
-                  identifier: Unit_Tests
-                  spec:
-                    connectorRef: ravidockerconnector
-                    image: python:3.11
-                    shell: Sh
-                    command: |-
-                      pip install --upgrade pip
-                      pip install -r requirements.txt
+                      mkdir -p test-results
                       pytest -v --junitxml=test-results/junit.xml
               - step:
                   type: Bandit
@@ -92,3 +82,128 @@ pipeline:
                     image: alpine:3.19
                     shell: Sh
                     command: "echo \"Built image: 491085423717.dkr.ecr.us-east-2.amazonaws.com/python-sample-app:<+codebase.commitSha>\""
+    - stage:
+        name: Deploy_Dev
+        identifier: Deploy_Dev
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: firstpythonservice
+            serviceInputs:
+              serviceDefinition:
+                type: Kubernetes
+                spec:
+                  artifacts:
+                    primary:
+                      primaryArtifactRef: python_sample_ecr
+                      sources:
+                        - identifier: python_sample_ecr
+                          type: Ecr
+                          spec:
+                            tag: <+codebase.commitSha>
+          environment:
+            environmentRef: DEV
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: deveks
+          execution:
+            steps:
+              - step:
+                  name: Rollout_Deployment
+                  identifier: rolloutDeployment
+                  type: K8sRollingDeploy
+                  timeout: 10m
+                  spec:
+                    skipDryRun: false
+                    pruningEnabled: false
+            rollbackSteps:
+              - step:
+                  name: Rollback_Rollout_Deployment
+                  identifier: rollbackRolloutDeployment
+                  type: K8sRollingRollback
+                  timeout: 10m
+                  spec:
+                    pruningEnabled: false
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
+    - stage:
+        name: Stage_Approval
+        identifier: Stage_Approval
+        type: Approval
+        spec:
+          execution:
+            steps:
+              - step:
+                  name: Approve_Stage_Deployment
+                  identifier: Approve_Stage_Deployment
+                  type: HarnessApproval
+                  timeout: 1d
+                  spec:
+                    approvalMessage: |-
+                      Please approve deployment to Stage.
+
+                      Application: firstpythonservice
+                      Image tag: <+codebase.commitSha>
+                      Branch: <+codebase.branch>
+                      Commit: <+codebase.commitSha>
+                    includePipelineExecutionHistory: true
+                    isAutoRejectEnabled: true
+                    approvers:
+                      minimumCount: 1
+                      disallowPipelineExecutor: false
+                      userGroups:
+                        - _project_all_users
+    - stage:
+        name: Deploy_Stage
+        identifier: Deploy_Stage
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: firstpythonservice
+            serviceInputs:
+              serviceDefinition:
+                type: Kubernetes
+                spec:
+                  artifacts:
+                    primary:
+                      primaryArtifactRef: python_sample_ecr
+                      sources:
+                        - identifier: python_sample_ecr
+                          type: Ecr
+                          spec:
+                            tag: <+codebase.commitSha>
+          environment:
+            environmentRef: STAGE
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: stageeks
+          execution:
+            steps:
+              - step:
+                  name: Rollout_Deployment
+                  identifier: rolloutDeployment
+                  type: K8sRollingDeploy
+                  timeout: 10m
+                  spec:
+                    skipDryRun: false
+                    pruningEnabled: false
+            rollbackSteps:
+              - step:
+                  name: Rollback_Rollout_Deployment
+                  identifier: rollbackRolloutDeployment
+                  type: K8sRollingRollback
+                  timeout: 10m
+                  spec:
+                    pruningEnabled: false
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
