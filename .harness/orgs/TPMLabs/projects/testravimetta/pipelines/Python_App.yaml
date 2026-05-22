@@ -131,6 +131,7 @@ pipeline:
                 - AllErrors
               action:
                 type: StageRollback
+        tags: {}
     - stage:
         name: Stage_Approval
         identifier: Stage_Approval
